@@ -8,7 +8,7 @@ class HashMap {
 
   hash(value) {
     let hashCode = 0;
-    const primeNumber = 31;
+    const primeNumber = 97;
 
     for (let i = 0; i < value.length; i += 1) {
       hashCode = primeNumber * hashCode + value.charCodeAt(i);
@@ -48,68 +48,63 @@ class HashMap {
   }
 
   get(key) {
-    let returnValue = null;
+    const index = this.hash(key);
+    this.checkOutOfBounds(index);
 
-    this.buckets.forEach((bucket) => {
-      if (bucket instanceof LinkedList) {
-        let tmp = bucket.getHead();
+    if (this.buckets[index] instanceof LinkedList) {
+      let tmp = this.buckets[index].getHead();
 
-        while (tmp !== null && returnValue === null) {
-          if (tmp.value.key === key) {
-            returnValue = tmp.value.value;
-          }
-
-          tmp = tmp.nextNode;
+      while (tmp !== null) {
+        if (tmp.value.key === key) {
+          return tmp.value.value;
         }
-      }
-    });
 
-    return returnValue;
+        tmp = tmp.nextNode;
+      }
+    }
+
+    return null;
   }
 
   has(key) {
-    let hasKey = false;
+    const index = this.hash(key);
+    this.checkOutOfBounds(index);
 
-    this.buckets.forEach((bucket) => {
-      if (bucket instanceof LinkedList) {
-        let tmp = bucket.getHead();
+    if (this.buckets[index] instanceof LinkedList) {
+      let tmp = this.buckets[index].getHead();
 
-        while (tmp !== null && !hasKey) {
-          if (tmp.value.key === key) {
-            hasKey = true;
-          }
-
-          tmp = tmp.nextNode;
+      while (tmp !== null) {
+        if (tmp.value.key === key) {
+          return true;
         }
-      }
-    });
 
-    return hasKey;
+        tmp = tmp.nextNode;
+      }
+    }
+
+    return false;
   }
 
   remove(key) {
-    let hasKey = false;
+    const index = this.hash(key);
+    this.checkOutOfBounds(index);
 
-    if (this.has(key)) {
-      this.buckets.forEach((bucket) => {
-        if (bucket instanceof LinkedList) {
-          let tmp = bucket.getHead();
-          let i = 0;
+    if (this.buckets[index] instanceof LinkedList) {
+      let tmp = this.buckets[index].getHead();
+      let i = 0;
 
-          while (tmp !== null && !hasKey) {
-            if (tmp.value.key === key) {
-              bucket.removeAt(i);
-              hasKey = true;
-            }
-
-            tmp = tmp.nextNode;
-            i += 1;
-          }
+      while (tmp !== null) {
+        if (tmp.value.key === key) {
+          this.buckets[index].removeAt(i);
+          return true;
         }
-      });
+
+        tmp = tmp.nextNode;
+        i += 1;
+      }
     }
 
-    return hasKey;
+    return false;
   }
 
   length() {
@@ -212,9 +207,9 @@ console.log(example.get('Sara'));
 console.log(example.get('Carlos'));
 console.log(example.has('Sara'));
 console.log(example.has('Carlos'));
-example.remove('Sara');
-example.remove('Carlos');
-console.log(example.length());
+console.log(example.remove('Sara'));
+console.log(example.remove('Carlos'));
+console.log(example.has('Sara'));
 example.set('Sara', '301');
 console.log(example.keys());
 console.log(example.values());
@@ -228,3 +223,4 @@ for (let i = 0; i < 11; i += 1) {
 console.log(example.buckets);
 example.set(String.fromCharCode(11), null);
 console.log(example.buckets);
+console.log(example.length());
